@@ -34,15 +34,16 @@ Agro Products
         <br>
         <b>Quantity : {{p.quantity}}</b>
         <hr>
-        <p class="card-text">{{p.productdesc}}</p>
-        
+        <p><b> Product description: </b> {{p.productdesc}}</p>
+        <br>
+        <p><b>pid : </b> {{p.pid}}</p>
  
-        <p>Owner : {{p.username}}</p>
-        <p>Email : {{p.email}}</p>
+        <p><b>Owner : </b> {{p.username}}</p>
+        <p><b>Email : </b> {{p.email}}</p>
       
 
         
-        <td><a href="/purchase/{{post.rid}}"><button class="btn btn-success">Purchase </button> </a> </td>
+        <td><a href="/purchase/{{p.pid}}"><button class="btn btn-success">Purchase </button> </a> </td>
       </div>
     </div>
   </div>
