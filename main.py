@@ -1,3 +1,4 @@
+import email
 from flask import Flask,render_template,request,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
@@ -55,7 +56,8 @@ class purchase(db.Model):
     pid=db.Column(db.Integer)
     productname=db.Column(db.String(100))
     price=db.Column(db.Integer)
-    quantity = db.Column(db.Integer)
+    quantity = db.Column(db.String(100))
+    address=db.Column(db.String(50))
     phonenumber = db.Column(db.Integer)
 
 class Trig(db.Model):
@@ -116,6 +118,28 @@ def farmerdetails():
 def adminfarmerdetails():
     query=db.engine.execute(f"CALL sample1()") 
     return render_template('adminfarmerdetails.html',query=query)
+
+
+
+@app.route("/purchase/<string:pid>",methods=['POST','GET'])
+@login_required
+def purchase(pid):
+    farming=db.engine.execute("SELECT * FROM `addagroproducts`")
+    posts=Addagroproducts.query.filter_by(pid=pid).first()
+    if request.method=="POST":
+        farmername=current_user.username
+        # pid=request.form.get('pid')
+        quantity=request.form.get('quantity')
+        price=request.form.get('price')
+        address=request.form.get('address')
+        phonenumber=request.form.get('phonenumber')
+        productname=request.form.get('productname')
+        query=db.engine.execute(f"INSERT INTO `purchase` (`username`,`pid`,`productname`,`price`,`quantity`,`address`,`phonenumber`) VALUES ('{farmername}','{pid}','{productname}','{price}','{quantity}','{address}','{phonenumber}')")
+        flash("Slot is Updates","success")
+        return redirect('/customeragroproducts')
+    
+    return render_template('purchase.html',posts=posts,farming=farming)
+
 
 # @app.route('/normalfarmerdetails')
 # @login_required
@@ -268,24 +292,44 @@ def adminedit(rid):
 
 
 
-@app.route("/purchase/<string:pid>",methods=['POST','GET'])
-@login_required
-def purchase(pid):
-    farming=db.engine.execute("SELECT * FROM `addagroproducts`")
-    posts=Addagroproducts.query.filter_by(pid=pid).first()
-    if request.method=="POST":
-        farmername=request.form.get('username')
-        productname=request.form.get('productname')
-        price=request.form.get('price')
-        quantity=request.form.get('quantity')
-        phonenumber=request.form.get('phonenumber')
+# @app.route("/purchase/<string:pid>/<string:username>/<string:price>",methods=['POST','GET'])
+# @login_required
+# def purchase(pid,username,price):
+#     farming=db.engine.execute("SELECT * FROM `addagroproducts`")
+#     posts=Addagroproducts.query.filter_by(pid=pid).first()
+#     if request.method=="POST":
+#         # farmername=request.form.get('username')
+#         productname=request.form.get('productname')
+#         # price=request.form.get('price')
+#         email=request.form.get('email')
+#         #quantity=request.form.get('quantity')
+#         phonenumber=request.form.get('phonenumber')
         
              
-        query=db.engine.execute(f"INSERT INTO `purchase` (`username`,`email`,`pid`,`productname`,`price`,`quantity`) VALUES ('{farmername}','{phonenumber}','{pid}','{productname}','{price}','{quantity}')")
-        flash("Slot is Updates","success")
-        return redirect('/customeragroproducts')
+        
+#         return redirect('/customeragroproducts')
     
-    return render_template('purchase.html',posts=posts,farming=farming)
+#     return render_template('purchase.html',posts=posts,farming=farming)
+
+# @app.route("/confirm/<string:pid>/<string:username>/<string:quantity>/<string:price>",methods=['POST','GET'])
+# @login_required
+# def confirm(pid,username,quantity,price):
+#     farming=db.engine.execute("SELECT * FROM `addagroproducts`")
+#     posts=Addagroproducts.query.filter_by(pid=pid).first()
+#     if request.method=="POST":
+#         # farmername=request.form.get('username')
+#         productname=request.form.get('productname')
+#         # price=request.form.get('price')
+#         email=request.form.get('email')
+#         #quantity=request.form.get('quantity')
+#         phonenumber=request.form.get('phonenumber')
+        
+             
+#         query=db.engine.execute(f"INSERT INTO `purchase` (`username`,`pid`,`productname`,`price`,`quantity`) VALUES ('{username}','{pid}','{productname}','{price}','{quantity}')")
+#         flash("Slot is Updates","success")
+#         return redirect('/customeragroproducts')
+    
+#     return render_template('purchase.html',posts=posts,farming=farming)
 
 
 # @app.route('/signup',methods=['POST','GET'])
