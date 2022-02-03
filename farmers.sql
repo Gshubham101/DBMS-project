@@ -41,12 +41,13 @@ CREATE TABLE `addagroproducts` (
 
 CREATE TABLE `purchase` (
   `username` varchar(50) NOT NULL,
-  `email` varchar(10) NOT NULL,
+  `address` varchar(10) NOT NULL,
   `oid` int(11) NOT NULL,
   `pid` int(11) NOT NULL,
   `productname` varchar(100) NOT NULL,
   `price` int(100) NOT NULL,
-  `quantity` int(100) NOT NULL
+  `quantity` varchar(100) NOT NULL,
+  `phonenumber` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
