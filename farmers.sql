@@ -41,13 +41,15 @@ CREATE TABLE `addagroproducts` (
 
 CREATE TABLE `purchase` (
   `username` varchar(50) NOT NULL,
+  `farmer` varchar(50) NOT NULL,
   `address` varchar(10) NOT NULL,
   `oid` int(11) NOT NULL,
   `pid` int(11) NOT NULL,
   `productname` varchar(100) NOT NULL,
   `price` int(100) NOT NULL,
-  `quantity` varchar(100) NOT NULL,
-  `phonenumber` int(10) NOT NULL
+  `quantity` int(10) NOT NULL,
+  `phonenumber` int(10) NOT NULL,
+  `timestamp` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -99,6 +101,16 @@ CREATE TABLE `register` (
 --
 -- Triggers `register`
 --
+
+-- CREATE TABLE `orders` (
+--   `id` int(11) NOT NULL,
+--   `oid` varchar(50) NOT NULL,
+--   `pid` varchar(50) NOT NULL,
+--   `address` varchar(10) NOT NULL,
+--   `customername` varchar(50) NOT NULL,
+--   `timestamp` datetime NOT NULL
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 DELIMITER $$
 CREATE TRIGGER `deletion` BEFORE DELETE ON `register` FOR EACH ROW INSERT INTO trig VALUES(null,OLD.rid,'FARMER DELETED',NOW())
 $$
@@ -111,6 +123,10 @@ DELIMITER $$
 CREATE TRIGGER `updation` AFTER UPDATE ON `register` FOR EACH ROW INSERT INTO trig VALUES(null,NEW.rid,'FARMER UPDATED',NOW())
 $$
 DELIMITER ;
+-- DELIMITER $$
+-- CREATE TRIGGER `transaction` AFTER INSERT ON `purchase` FOR EACH ROW INSERT INTO orders VALUES(null,NEW.oid,`purchase`.pid,`purchase`.address,`purchase`.customername,NOW())
+-- $$
+-- DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -305,3 +321,14 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- DELIMITER $$
+
+-- CREATE PROCEDURE order(IN username varchar(50))
+-- BEGIN
+-- 	SELECT * FROM `purchase`
+--   INNER JOIN `addagroproducts` ON `addagroproducts.pid`=`purchase.pid`
+--   WHERE `addagroproducts.username`=username;
+-- END $$
+
+-- DELIMITER ;

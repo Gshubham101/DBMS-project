@@ -26,6 +26,10 @@ def load_user(user_id):
 def customer_load_user(user_id):
     return customer.query.get(int(user_id))
 
+@login_manager.user_loader
+def admin_load_user(user_id):
+    return adminuser.query.get(int(user_id))
+
 # app.config['SQLALCHEMY_DATABASE_URL']='mysql://username:password@localhost/databas_table_name'
 app.config['SQLALCHEMY_DATABASE_URI']='mysql://root:@localhost/farm'
 db=SQLAlchemy(app)
@@ -52,18 +56,27 @@ class Addagroproducts(db.Model):
 
 class purchase(db.Model):
     farmername=db.Column(db.String(50))
+    username=db.Column(db.String(50))
     oid=db.Column(db.Integer,primary_key=True)
     pid=db.Column(db.Integer)
     productname=db.Column(db.String(100))
     price=db.Column(db.Integer)
-    quantity = db.Column(db.String(100))
+    quantity = db.Column(db.Integer)
     address=db.Column(db.String(50))
+    timestamp=db.Column(db.String(100))
     phonenumber = db.Column(db.Integer)
 
 class Trig(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     fid=db.Column(db.String(100))
     action=db.Column(db.String(100))
+    timestamp=db.Column(db.String(100))
+class Orders(db.Model):
+    id=db.Column(db.Integer,primary_key=True)
+    oid=db.Column(db.String(100))
+    pid=db.Column(db.String(100))
+    address=db.Column(db.String(50))
+    username=db.Column(db.String(50))
     timestamp=db.Column(db.String(100))
 
 
@@ -127,19 +140,46 @@ def purchase(pid):
     farming=db.engine.execute("SELECT * FROM `addagroproducts`")
     posts=Addagroproducts.query.filter_by(pid=pid).first()
     if request.method=="POST":
-        farmername=current_user.username
+        farmername=request.form.get('name')
+        username=request.form.get('farmername')
         # pid=request.form.get('pid')
         quantity=request.form.get('quantity')
         price=request.form.get('price')
         address=request.form.get('address')
         phonenumber=request.form.get('phonenumber')
         productname=request.form.get('productname')
-        query=db.engine.execute(f"INSERT INTO `purchase` (`username`,`pid`,`productname`,`price`,`quantity`,`address`,`phonenumber`) VALUES ('{farmername}','{pid}','{productname}','{price}','{quantity}','{address}','{phonenumber}')")
+        newquantity=int(posts.quantity)-int(quantity)
+        
+        query=db.engine.execute(f"INSERT INTO `purchase` (`username`,`farmer`,`pid`,`productname`,`price`,`quantity`,`address`,`phonenumber`,`timestamp`) VALUES ('{farmername}','{username}','{pid}','{productname}','{price}','{quantity}','{address}','{phonenumber}',strftime())")
+        query=db.engine.execute(f" UPDATE `addagroproducts` SET `quantity`='{newquantity}' WHERE `pid`='{pid}'" )
         flash("Slot is Updates","success")
         return redirect('/customeragroproducts')
     
     return render_template('purchase.html',posts=posts,farming=farming)
 
+
+@app.route("/adminpurchase/<string:pid>",methods=['POST','GET'])
+@login_required
+def adminpurchase(pid):
+    farming=db.engine.execute("SELECT * FROM `addagroproducts`")
+    posts=Addagroproducts.query.filter_by(pid=pid).first()
+    if request.method=="POST":
+        farmername=request.form.get('name')
+        username=request.form.get('farmername')
+        # pid=request.form.get('pid')
+        quantity=request.form.get('quantity')
+        price=request.form.get('price')
+        address=request.form.get('address')
+        phonenumber=request.form.get('phonenumber')
+        productname=request.form.get('productname')
+        newquantity=int(posts.quantity)-int(quantity)
+        
+        query=db.engine.execute(f"INSERT INTO `purchase` (`username`,`farmer`,`pid`,`productname`,`price`,`quantity`,`address`,`phonenumber`) VALUES ('{farmername}','{username}','{pid}','{productname}','{price}','{quantity}','{address}','{phonenumber}')")
+        query=db.engine.execute(f" UPDATE `addagroproducts` SET `quantity`='{newquantity}' WHERE `pid`='{pid}'" )
+        flash("Slot is Updates","success")
+        return redirect('/adminagroproducts')
+    
+    return render_template('adminpurchase.html',posts=posts,farming=farming)
 
 # @app.route('/normalfarmerdetails')
 # @login_required
@@ -210,6 +250,12 @@ def adminaddagroproduct():
 def triggers():
     query=db.engine.execute(f"SELECT * FROM `trig`") 
     return render_template('triggers.html',query=query)
+
+@app.route('/orders')
+@login_required
+def orders():
+    query=db.engine.execute(f"SELECT * FROM `purchase`")  
+    return render_template('orders.html',query=query)
 
 @app.route('/addfarming',methods=['POST','GET'])
 @login_required
@@ -489,6 +535,7 @@ def customerlogin():
             return render_template('customerlogin.html')    
 
     return render_template('customerlogin.html')
+
 
 @app.route('/adminlogin',methods=['POST','GET'])
 def adminlogin():
