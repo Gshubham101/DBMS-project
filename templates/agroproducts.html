@@ -26,6 +26,7 @@ Agro Products
 <div class="row">
 
   {% for p in query %}
+  {% if p.quantity > 0 %}
   <div class="col-sm-4">
     <div class="card">
       <div class="card-body">
@@ -46,6 +47,7 @@ Agro Products
       </div>
     </div>
   </div>
+  {% endif %}
   {% endfor %}
 </div>
   

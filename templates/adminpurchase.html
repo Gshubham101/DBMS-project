@@ -31,11 +31,11 @@
 <div class="container">
 
 <div class="row">
-
+<!-- 
 <div class="col-md-4"></div>
-<div class="col-md-4">
+<div class="col-md-4"> -->
 
-<form action="/purchase/{{posts.pid}}" method="post">
+<form action="/adminpurchase/{{posts.pid}}" method="post">
 <div class="form-group">
 
 <label for="rollno">Farmer Name</label>
@@ -47,7 +47,6 @@
 <input type="text" class="form-control"  name="name" id="name"required >
 </div>
 <br>
-
 
 
 <div class="form-group">
@@ -64,7 +63,7 @@
 
 <div class="form-group">
 <label for="num">Phone Number</label>
-<input type="number" class="form-control" name="phonenumber" id="phonenumber" value={{posts.phonenumber}} required>
+<input type="number" class="form-control" name="phonenumber" id="phonenumber"  required>
 </div>
 <br>
 
