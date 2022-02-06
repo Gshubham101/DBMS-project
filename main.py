@@ -5,12 +5,14 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import login_user,logout_user,login_manager,LoginManager
 from flask_login import login_required,current_user
+import os
 
+x=os.urandom(24)
 
 # MY db connection
 local_server= True
 app = Flask(__name__)
-app.secret_key='harshithbhaskar'
+app.secret_key=x
 
 
 # this is for getting unique user access
@@ -22,9 +24,9 @@ login_manager.login_view='login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@login_manager.user_loader
-def customer_load_user(user_id):
-    return customer.query.get(int(user_id))
+# @login_manager.user_loader
+# def customer_load_user(user_id):
+#     return customer.query.get(int(user_id))
 
 @login_manager.user_loader
 def admin_load_user(user_id):
@@ -135,7 +137,7 @@ def adminfarmerdetails():
 
 
 @app.route("/purchase/<string:pid>",methods=['POST','GET'])
-@login_required
+
 def purchase(pid):
     farming=db.engine.execute("SELECT * FROM `addagroproducts`")
     posts=Addagroproducts.query.filter_by(pid=pid).first()
@@ -150,7 +152,7 @@ def purchase(pid):
         productname=request.form.get('productname')
         newquantity=int(posts.quantity)-int(quantity)
         
-        query=db.engine.execute(f"INSERT INTO `purchase` (`username`,`farmer`,`pid`,`productname`,`price`,`quantity`,`address`,`phonenumber`,`timestamp`) VALUES ('{farmername}','{username}','{pid}','{productname}','{price}','{quantity}','{address}','{phonenumber}',strftime())")
+        query=db.engine.execute(f"INSERT INTO `purchase` (`username`,`farmer`,`pid`,`productname`,`price`,`quantity`,`address`,`phonenumber`) VALUES ('{farmername}','{username}','{pid}','{productname}','{price}','{quantity}','{address}','{phonenumber}')")
         query=db.engine.execute(f" UPDATE `addagroproducts` SET `quantity`='{newquantity}' WHERE `pid`='{pid}'" )
         flash("Slot is Updates","success")
         return redirect('/customeragroproducts')
@@ -569,7 +571,7 @@ def adminlogout():
     return redirect(url_for('adminlogin'))
 
 @app.route('/customerlogout')
-@login_required
+
 def customerlogout():
     logout_user()
     flash("Logout SuccessFul","warning")
